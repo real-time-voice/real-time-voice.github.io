@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Real-Time Voice AI Hears but Does Not Listen</title>
+<meta name="description" content="Four leading production real-time voice systems act on the words rather than the voice." />
+<link rel="canonical" href="https://real-time-voice.github.io/" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://real-time-voice.github.io/" />
+<meta property="og:title" content="Real-Time Voice AI Hears but Does Not Listen" />
+<meta property="og:description" content="Four leading production real-time voice systems act on the words rather than the voice." />
+<meta property="og:image" content="https://real-time-voice.github.io/assets/img/figure.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">Preprint</p>
+    <h1>Real-Time Voice AI Hears but Does Not Listen</h1>
+    <p class="authors">
+      <span>Martijn Bartelds<sup>1</sup></span>&ensp;
+      <span>Federico Bianchi<sup>1</sup></span>&ensp;
+      <span>James Zou<sup>1,2</sup></span>
+    </p>
+    <p class="affil"><sup>1</sup>&thinsp;Together AI &nbsp;·&nbsp; <sup>2</sup>&thinsp;Stanford University</p>
+    <nav class="reslinks" aria-label="Resources">
+      <a href="https://arxiv.org/abs/2606.26083" target="_blank" rel="noopener">Paper</a>
+      <a href="https://github.com/bartelds/real-time-voice" target="_blank" rel="noopener">Code</a>
+      <a href="https://huggingface.co/datasets/bartelds/real-time-voice" target="_blank" rel="noopener">Data</a>
+      <a href="#demos">Listen to demos</a>
+      <a href="#cite">BibTeX</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="section opening">
+    <div class="wrap">
+      <div class="hook">
+        <p class="hook-label">Listen</p>
+        <p class="hook-text">When a caller's words and delivery disagree, real-time voice systems go with the words. A 911 caller is crying but insists everything is fine, and GPT Realtime 2 ended the call.</p>
+        <audio controls preload="none" src="assets/audio/conversations/welfare_gpt.mp3"></audio>
+        <p class="hook-more"><a href="#demos">More calls below &rarr;</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section abstract">
+    <div class="wrap">
+      <h2>Abstract</h2>
+      <p>
+        Speech conveys information through both words and vocal delivery. We evaluate four leading production realtime voice systems—OpenAI’s GPT Realtime 2, Google’s Gemini 3.1 Flash Live, and Alibaba’s Qwen3.5 Omni Plus and Omni Flash—on tasks where the words and the delivery patterns both convey meaningful information. Across three consequential scenarios, all four systems act on the words rather than the voice. They end calls with crying callers who insist nothing is wrong, approve wire transfers authorized in frightened voices, and enroll callers whose agreement is clearly sarcastic. Surprisingly, this is often not a failure of perception. When asked directly, three of the four systems reliably identify the distress, fear, or sarcasm they later ignore when making decisions. We observe a similar pattern when these realtime voice systems estimate accent and age, as their responses frequently follow the biases of the words rather than the acoustic properties of the speaker. We term this disconnect between perception and action the <em>emotional intelligence gap</em> of voice AI. Prompting systems to explicitly attend to vocal delivery improves performance only partially and inconsistently. Our findings show that current realtime voice AI systems often behave as if speech had been reduced to a transcript, suggesting that they should be used with caution in settings where the tone and emotion of delivery convey important information.
+      </p>
+    </div>
+    <div class="wrap wide">
+      <figure>
+        <img src="assets/img/figure.png" alt="Overview of the scenarios, the expected action, and what the systems did." />
+        <figcaption><span class="figlabel">Figure 1</span>In each scenario the caller's wording and delivery point to opposite actions, so the expected action (third column) turns on the delivery. The realtime voice systems tend to do the opposite (fourth column), acting on the wording and against the delivery.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Experimental setup</h2>
+      <p>
+        We test four production real-time voice systems on tasks where the words and the voice point to
+        different conclusions.
+      </p>
+      <div class="systems">
+        <div class="row"><span class="name">OpenAI · GPT Realtime 2</span><span class="id">gpt-realtime-2</span></div>
+        <div class="row"><span class="name">Google · Gemini 3.1 Flash Live</span><span class="id">gemini-3.1-flash-live-preview</span></div>
+        <div class="row"><span class="name">Alibaba · Qwen3.5 Omni Plus Realtime</span><span class="id">qwen3.5-omni-plus-realtime</span></div>
+        <div class="row"><span class="name">Alibaba · Qwen3.5 Omni Flash Realtime</span><span class="id">qwen3.5-omni-flash-realtime</span></div>
+      </div>
+      <p>
+        We run two kinds of experiments. Multi-turn scenario calls measure the action a system takes in a consequential decision. Single-turn diagnostics measure what a system reports from the voice in isolation. The caller and the diagnostic stimuli are synthesized with <a href="https://elevenlabs.io" target="_blank" rel="noopener">ElevenLabs</a> (<span class="mono">eleven_v3</span>). The systems produce their own spoken replies. Each condition is run five times.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="demos">
+    <div class="wrap">
+      <p class="eyebrow">Multi-turn scenario calls</p>
+      <h2>Words determine the consequential decisions</h2>
+      <p>
+        In each scenario the system plays the agent who decides what to do. Each scenario opens with a
+        fixed clip with identical wording across the two deliveries, differing only in how it is
+        spoken.
+      </p>
+      <div id="scenarios"></div>
+    </div>
+    <div class="wrap wide">
+      <figure>
+        <img src="assets/img/fraud_turns.png" alt="Scenario outcomes under the marked delivery." />
+        <figcaption><span class="figlabel">Figure 2</span>Scenario outcomes under the marked delivery. Each dot is one of five runs. A red dot marks a run that followed the script and a green dot one that followed the delivery.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">Single-turn diagnostics</p>
+      <h2>Emotional delivery is perceived but not acted on</h2>
+      <p>
+        Each diagnostic reuses a scenario's opening clip, the same calm and marked openers heard above,
+        and asks over 20 runs whether the speaker sounds distressed, frightened, or sarcastic.
+      </p>
+      <p>
+        Three of the four systems detect the marked delivery far more than the matched neutral one, and
+        well above a text-only baseline. Qwen3.5 Omni Flash is the exception.
+      </p>
+    </div>
+    <div class="wrap wide">
+      <figure>
+        <img src="assets/img/affect_discrimination.png" alt="Delivery labeling across audio and text-only conditions." />
+        <figcaption><span class="figlabel">Figure 3</span>Delivery labeling across audio and text-only conditions. Bars show the number of runs, out of 20, in which each model assigned the target delivery label. Green bars correspond to clips where the delivery was present, orange bars to calm or sincere control clips, and gray bars to the text-only condition.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">Single-turn diagnostics</p>
+      <h2>Accent and age are only partially perceived</h2>
+      <p>
+        The same conflict extends beyond emotional delivery. The accent and age diagnostics ask the
+        model to identify a speaker's accent or age from a recording whose wording points to a
+        different answer.
+      </p>
+      <h3 class="topic">Accent</h3>
+      <p>
+        Five voices, each with a different English accent (Indian, Australian, Nigerian, French, and
+        Mandarin), read passages about Italy, Japan, and the Netherlands, so the words point to one
+        place while the accent points to another. Asked the accent, three of the four systems mostly
+        name the country in the script. Qwen3.5 Omni Plus is the partial exception.
+      </p>
+      <p class="listen-label">Listen: one passage in five accents</p>
+      <div id="accent-gallery"></div>
+    </div>
+    <div class="wrap wide">
+      <figure>
+        <img src="assets/img/accent_perception.png" alt="Distribution of perceived-accent labels by voice." />
+        <figcaption><span class="figlabel">Figure 4</span>Distribution of perceived-accent labels by voice. Most realtime systems cluster on the script-coded country. Qwen3.5 Omni Plus recovers the voice's true accent for several voices.</figcaption>
+      </figure>
+    </div>
+    <div class="wrap">
+      <hr class="divider" />
+      <h3 class="topic">Age</h3>
+      <p>
+        Older adult voices read a child's script. Asked the speaker's age, most systems return a
+        child's age, following the script rather than the voice. Gemini 3.1 Flash Live does so least
+        often.
+      </p>
+      <p class="listen-label">Listen: older adult voices reading the child's script</p>
+      <div id="age-gallery"></div>
+    </div>
+    <div class="wrap wide">
+      <figure>
+        <img src="assets/img/age_perception.png" alt="Estimated-age midpoints by case and model." />
+        <figcaption><span class="figlabel">Figure 5</span>Estimated-age midpoints by case and model. GPT Realtime 2's and Qwen3.5 Omni Plus's estimates fall in early childhood, driven by the script. Gemini Live's do so on five of the eight recordings but track the mature voice on the other three. Qwen3.5 Omni Flash does so on seven of eight.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Discussion</h2>
+      <p>
+        All four systems determine their actions primarily based on the words and not the delivery, and
+        their decisions agree in 119 of the 120 runs across providers and capability tiers. For three of
+        the four, the delivery is perceived but ignored at the point of action. Because they act on the
+        wording, the conflict leaves no trace in the transcript, so a transcript-only evaluation would
+        miss the failure. We recommend that real-time voice AI be deployed with caution until they can
+        close the emotional intelligence gap.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Audio</h2>
+      <p>
+        The clips here are a subset of our recordings, provided <strong>solely to document this
+        research</strong>. Please do not reuse them to train, evaluate, benchmark, or otherwise build
+        machine-learning or AI systems. The full set is on
+        <a href="https://huggingface.co/datasets/bartelds/real-time-voice" target="_blank" rel="noopener">Hugging Face</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="cite">
+    <div class="wrap">
+      <h2>Citation</h2>
+      <pre class="cite">@misc{bartelds2026realtimevoiceaihears,
+      title={Real-Time Voice AI Hears but Does Not Listen}, 
+      author={Martijn Bartelds and Federico Bianchi and James Zou},
+      year={2026},
+      eprint={2606.26083},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2606.26083}, 
+}</pre>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <p>
+      Correspondence: <a href="mailto:mbartelds@together.ai">mbartelds@together.ai</a>
+    </p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
